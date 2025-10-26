@@ -1,0 +1,294 @@
+[gd_scene load_steps=8 format=4 uid="uid://b0sy1n25is0mk"]
+
+[ext_resource type="Texture2D" uid="uid://4wuqaup8u4nw" path="res://mazeproject/standalone/spr_demotile.png" id="1_8ufy2"]
+
+[sub_resource type="GDScript" id="GDScript_8ufy2"]
+script/source = "extends Node2D
+
+@export var initial : bool
+
+@export var overrideLeft : bool
+@export var overrideUp : bool
+@export var overrideRight : bool
+@export var overrideDown : bool
+
+func _ready():
+	if initial:
+		go()
+
+func _physics_process(delta: float) -> void:
+	if Main.GetCharacter(0) != null and self.position.distance_to(Main.GetCharacter(0).position) > 2000.0:
+		self.queue_free()
+
+func go():
+	# Spawn an enemy or not (This was gonna be an abstraction but for now its empty in this repo version)
+	# Essentially, this would use a randi_range of 0 to 2 to determine whether to spawn nothing, a chest, or an enemy.
+	# Then it would randomize the encounter size from 1 to 3, or spawn a chest with a random item ID.
+	
+	# Randomize the directions we can go in.
+	for i in range(0,4):
+		# 0 = Left, 1 = Up, 2 = Right, 3 = Down
+		match i:
+			0:
+				if randi_range(0,1) and ! overrideLeft:
+					$TileLeft.queue_free()
+					$SpawnCheckLeft.queue_free()
+				else:
+					$BlockLeft.queue_free()
+			1:
+				if randi_range(0,1) and ! overrideUp:
+					$TileUp.queue_free()
+					$SpawnCheckUp.queue_free()
+				else:
+					$BlockUp.queue_free()
+			2:
+				if randi_range(0,1) and ! overrideRight:
+					$TileRight.queue_free()
+					$SpawnCheckRight.queue_free()
+				else:
+					$BlockRight.queue_free()
+			3:
+				if randi_range(0,1) and ! overrideDown:
+					$TileDown.queue_free()
+					$SpawnCheckDown.queue_free()
+				else:
+					$BlockDown.queue_free()
+
+func _on_spawn_check_left_body_entered(body: Node2D) -> void:
+	# Spawn to specified loc node
+	if body == Main.GetCharacter(0) and !overrideLeft:
+		var b = load(\"res://mazeproject/standalone/obj_randomplatforminst.tscn\")
+		var a = b.instantiate()
+		await get_tree().create_timer(0.1).timeout
+		Main.CurrentWorld.add_child(a)
+		
+		a.global_position = $SpawnCheckLeft/Loc.global_position
+		a.overrideRight = true # We don't want the path to be gone when we try entering.
+		
+		a.go()
+		overrideLeft = true
+
+func _on_spawn_check_up_body_entered(body: Node2D) -> void:
+	# Spawn to specified loc node
+	if body == Main.GetCharacter(0) and !overrideUp:
+		var b = load(\"res://mazeproject/standalone/obj_randomplatforminst.tscn\")
+		var a = b.instantiate()
+		await get_tree().create_timer(0.1).timeout
+		Main.CurrentWorld.add_child(a)
+		
+		a.global_position = $SpawnCheckUp/Loc.global_position
+		a.overrideDown = true # We don't want the path to be gone when we try entering.
+		
+		a.go()
+		overrideUp = true
+	
+func _on_spawn_check_right_body_entered(body: Node2D) -> void:
+	# Spawn to specified loc node
+	if body == Main.GetCharacter(0) and !overrideRight:
+		var b = load(\"res://mazeproject/standalone/obj_randomplatforminst.tscn\")
+		var a = b.instantiate()
+		await get_tree().create_timer(0.1).timeout
+		Main.CurrentWorld.add_child(a)
+		
+		a.global_position = $SpawnCheckRight/Loc.global_position
+		a.overrideLeft = true # We don't want the path to be gone when we try entering.
+		
+		a.go()
+		overrideRight = true
+		
+func _on_spawn_check_down_body_entered(body: Node2D) -> void:
+	# Spawn to specified loc node
+	if body == Main.GetCharacter(0) and !overrideDown:
+		var b = load(\"res://mazeproject/standalone/obj_randomplatforminst.tscn\")
+		var a = b.instantiate()
+		await get_tree().create_timer(0.1).timeout
+		Main.CurrentWorld.add_child(a)
+		
+		a.global_position = $SpawnCheckDown/Loc.global_position
+		a.overrideUp = true # We don't want the path to be gone when we try entering.
+		
+		a.go()
+		overrideDown = true
+
+
+func _on_center_check_body_entered(body: Node2D) -> void:
+	if body == Main.GetCharacter(0):
+		overrideDown = false
+		overrideLeft = false
+		overrideUp = false
+		overrideRight = false
+"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vxkus"]
+texture = ExtResource("1_8ufy2")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_kq7dl"]
+tile_size = Vector2i(32, 32)
+sources/0 = SubResource("TileSetAtlasSource_vxkus")
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qiv5m"]
+size = Vector2(65, 128)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8ufy2"]
+size = Vector2(448, 448)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xusev"]
+size = Vector2(64, 128)
+
+[node name="ObjRandomPlatformInst" type="Node2D"]
+script = SubResource("GDScript_8ufy2")
+
+[node name="Colision_Base" type="StaticBody2D" parent="."]
+scale = Vector2(2, 2)
+collision_layer = 3
+collision_mask = 3
+
+[node name="Collider" type="CollisionPolygon2D" parent="Colision_Base"]
+polygon = PackedVector2Array(-64, 32, -576, 32, -576, 576, -32, 576, -32, 64, -64, 64)
+
+[node name="Collider2" type="CollisionPolygon2D" parent="Colision_Base"]
+rotation = 1.5707964
+polygon = PackedVector2Array(-64, 32, -576, 32, -576, 576, -32, 576, -32, 64, -64, 64)
+
+[node name="Collider3" type="CollisionPolygon2D" parent="Colision_Base"]
+rotation = 3.1415927
+polygon = PackedVector2Array(-64, 32, -576, 32, -576, 576, -32, 576, -32, 64, -64, 64)
+
+[node name="Collider4" type="CollisionPolygon2D" parent="Colision_Base"]
+rotation = 4.712389
+polygon = PackedVector2Array(-64, 32, -576, 32, -576, 576, -32, 576, -32, 64, -64, 64)
+
+[node name="Tile_base" type="TileMapLayer" parent="."]
+z_index = -1
+scale = Vector2(2, 2)
+tile_map_data = PackedByteArray("AAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAD/////AAAAAAAAAAAAAP//AAAAAAAAAAABAP//AAAAAAAAAAABAAAAAAAAAAAAAAD+/wAAAAAAAAAAAAD+////AAAAAAAAAAD//wEAAAAAAAAAAAAAAAEAAAAAAAAAAAABAAEAAAAAAAAAAAD+/wEAAAAAAAAAAAD+//7/AAAAAAAAAAD///7/AAAAAAAAAAAAAP7/AAAAAAAAAAABAP7/AAAAAAAAAAA=")
+tile_set = SubResource("TileSet_kq7dl")
+
+[node name="TileLeft" type="TileMapLayer" parent="."]
+z_index = -1
+scale = Vector2(2, 2)
+tile_map_data = PackedByteArray("AADu////AAAAAAAAAADu/wAAAAAAAAAAAADv////AAAAAAAAAADv/wAAAAAAAAAAAADw////AAAAAAAAAADw/wAAAAAAAAAAAADx////AAAAAAAAAADx/wAAAAAAAAAAAADy////AAAAAAAAAADy/wAAAAAAAAAAAADz////AAAAAAAAAADz/wAAAAAAAAAAAAD0////AAAAAAAAAAD0/wAAAAAAAAAAAAD1////AAAAAAAAAAD1/wAAAAAAAAAAAAD2////AAAAAAAAAAD2/wAAAAAAAAAAAAD3////AAAAAAAAAAD3/wAAAAAAAAAAAAD4////AAAAAAAAAAD4/wAAAAAAAAAAAAD5////AAAAAAAAAAD5/wAAAAAAAAAAAAD6////AAAAAAAAAAD6/wAAAAAAAAAAAAD7////AAAAAAAAAAD7/wAAAAAAAAAAAAD8////AAAAAAAAAAD8/wAAAAAAAAAAAAD9////AAAAAAAAAAD9/wAAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_kq7dl")
+
+[node name="TileUp" type="TileMapLayer" parent="."]
+z_index = -1
+scale = Vector2(2, 2)
+tile_map_data = PackedByteArray("AAD//+7/AAAAAAAAAAD//+//AAAAAAAAAAD///D/AAAAAAAAAAD///H/AAAAAAAAAAD///L/AAAAAAAAAAD///P/AAAAAAAAAAD///T/AAAAAAAAAAD///X/AAAAAAAAAAD///b/AAAAAAAAAAD///f/AAAAAAAAAAD///j/AAAAAAAAAAD///n/AAAAAAAAAAD///r/AAAAAAAAAAD///v/AAAAAAAAAAD///z/AAAAAAAAAAD///3/AAAAAAAAAAAAAO7/AAAAAAAAAAAAAO//AAAAAAAAAAAAAPD/AAAAAAAAAAAAAPH/AAAAAAAAAAAAAPL/AAAAAAAAAAAAAPP/AAAAAAAAAAAAAPT/AAAAAAAAAAAAAPX/AAAAAAAAAAAAAPb/AAAAAAAAAAAAAPf/AAAAAAAAAAAAAPj/AAAAAAAAAAAAAPn/AAAAAAAAAAAAAPr/AAAAAAAAAAAAAPv/AAAAAAAAAAAAAPz/AAAAAAAAAAAAAP3/AAAAAAAAAAA=")
+tile_set = SubResource("TileSet_kq7dl")
+
+[node name="TileRight" type="TileMapLayer" parent="."]
+z_index = -1
+scale = Vector2(2, 2)
+tile_map_data = PackedByteArray("AAACAP//AAAAAAAAAAACAAAAAAAAAAAAAAADAP//AAAAAAAAAAADAAAAAAAAAAAAAAAEAP//AAAAAAAAAAAEAAAAAAAAAAAAAAAFAP//AAAAAAAAAAAFAAAAAAAAAAAAAAAGAP//AAAAAAAAAAAGAAAAAAAAAAAAAAAHAP//AAAAAAAAAAAHAAAAAAAAAAAAAAAIAP//AAAAAAAAAAAIAAAAAAAAAAAAAAAJAP//AAAAAAAAAAAJAAAAAAAAAAAAAAAKAP//AAAAAAAAAAAKAAAAAAAAAAAAAAALAP//AAAAAAAAAAALAAAAAAAAAAAAAAAMAP//AAAAAAAAAAAMAAAAAAAAAAAAAAANAP//AAAAAAAAAAANAAAAAAAAAAAAAAAOAP//AAAAAAAAAAAOAAAAAAAAAAAAAAAPAP//AAAAAAAAAAAPAAAAAAAAAAAAAAAQAP//AAAAAAAAAAAQAAAAAAAAAAAAAAARAP//AAAAAAAAAAARAAAAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_kq7dl")
+
+[node name="TileDown" type="TileMapLayer" parent="."]
+z_index = -1
+scale = Vector2(2, 2)
+tile_map_data = PackedByteArray("AAD//wIAAAAAAAAAAAD//wMAAAAAAAAAAAD//wQAAAAAAAAAAAD//wUAAAAAAAAAAAD//wYAAAAAAAAAAAD//wcAAAAAAAAAAAD//wgAAAAAAAAAAAD//wkAAAAAAAAAAAD//woAAAAAAAAAAAD//wsAAAAAAAAAAAD//wwAAAAAAAAAAAD//w0AAAAAAAAAAAD//w4AAAAAAAAAAAD//w8AAAAAAAAAAAD//xAAAAAAAAAAAAD//xEAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA8AAAAAAAAAAAAAABAAAAAAAAAAAAAAABEAAAAAAAAAAAA=")
+tile_set = SubResource("TileSet_kq7dl")
+
+[node name="SpawnCheckLeft" type="Area2D" parent="."]
+collision_layer = 3
+collision_mask = 3
+
+[node name="Colider" type="CollisionShape2D" parent="SpawnCheckLeft"]
+position = Vector2(-544.5, 0)
+shape = SubResource("RectangleShape2D_qiv5m")
+debug_color = Color(0.7, 0.65333337, 0, 0.41960785)
+
+[node name="Loc" type="Node2D" parent="SpawnCheckLeft"]
+position = Vector2(-2304, 0)
+
+[node name="SpawnCheckUp" type="Area2D" parent="."]
+rotation = 1.5707964
+collision_layer = 3
+collision_mask = 3
+
+[node name="Colider" type="CollisionShape2D" parent="SpawnCheckUp"]
+position = Vector2(-544.5, 0)
+shape = SubResource("RectangleShape2D_qiv5m")
+debug_color = Color(0.7, 0.65333337, 0, 0.41960785)
+
+[node name="Loc" type="Node2D" parent="SpawnCheckUp"]
+position = Vector2(-2304, 0)
+
+[node name="SpawnCheckRight" type="Area2D" parent="."]
+rotation = 3.1415927
+collision_layer = 3
+collision_mask = 3
+
+[node name="Colider" type="CollisionShape2D" parent="SpawnCheckRight"]
+position = Vector2(-544.5, 0)
+shape = SubResource("RectangleShape2D_qiv5m")
+debug_color = Color(0.7, 0.65333337, 0, 0.41960785)
+
+[node name="Loc" type="Node2D" parent="SpawnCheckRight"]
+position = Vector2(-2304, 0)
+
+[node name="SpawnCheckDown" type="Area2D" parent="."]
+rotation = 4.712389
+collision_layer = 3
+collision_mask = 3
+
+[node name="Colider" type="CollisionShape2D" parent="SpawnCheckDown"]
+position = Vector2(-544.5, 0)
+shape = SubResource("RectangleShape2D_qiv5m")
+debug_color = Color(0.7, 0.65333337, 0, 0.41960785)
+
+[node name="Loc" type="Node2D" parent="SpawnCheckDown"]
+position = Vector2(-2304, 0)
+
+[node name="CenterCheck" type="Area2D" parent="."]
+collision_layer = 3
+collision_mask = 3
+
+[node name="Colider" type="CollisionShape2D" parent="CenterCheck"]
+shape = SubResource("RectangleShape2D_8ufy2")
+
+[node name="BlockLeft" type="StaticBody2D" parent="."]
+collision_layer = 3
+collision_mask = 3
+
+[node name="Colider" type="CollisionShape2D" parent="BlockLeft"]
+position = Vector2(-160, 0)
+shape = SubResource("RectangleShape2D_xusev")
+debug_color = Color(0, 0.7, 0.19833331, 0.41960785)
+
+[node name="BlockUp" type="StaticBody2D" parent="."]
+rotation = 1.5707964
+collision_layer = 3
+collision_mask = 3
+
+[node name="Colider" type="CollisionShape2D" parent="BlockUp"]
+position = Vector2(-160, 0)
+shape = SubResource("RectangleShape2D_xusev")
+debug_color = Color(0, 0.7, 0.19833331, 0.41960785)
+
+[node name="BlockRight" type="StaticBody2D" parent="."]
+rotation = 3.1415927
+collision_layer = 3
+collision_mask = 3
+
+[node name="Colider" type="CollisionShape2D" parent="BlockRight"]
+position = Vector2(-160, 0)
+shape = SubResource("RectangleShape2D_xusev")
+debug_color = Color(0, 0.7, 0.19833331, 0.41960785)
+
+[node name="BlockDown" type="StaticBody2D" parent="."]
+rotation = 4.712389
+collision_layer = 3
+collision_mask = 3
+
+[node name="Colider" type="CollisionShape2D" parent="BlockDown"]
+position = Vector2(-160, 0)
+shape = SubResource("RectangleShape2D_xusev")
+debug_color = Color(0, 0.7, 0.19833331, 0.41960785)
+
+[connection signal="body_entered" from="SpawnCheckLeft" to="." method="_on_spawn_check_left_body_entered"]
+[connection signal="body_entered" from="SpawnCheckUp" to="." method="_on_spawn_check_up_body_entered"]
+[connection signal="body_entered" from="SpawnCheckRight" to="." method="_on_spawn_check_right_body_entered"]
+[connection signal="body_entered" from="SpawnCheckDown" to="." method="_on_spawn_check_down_body_entered"]
+[connection signal="body_entered" from="CenterCheck" to="." method="_on_center_check_body_entered"]

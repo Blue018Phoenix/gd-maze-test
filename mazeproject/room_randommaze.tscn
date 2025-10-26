@@ -1,0 +1,41 @@
+[gd_scene load_steps=4 format=3 uid="uid://sl058nwuufo0"]
+
+[ext_resource type="Texture2D" uid="uid://c4tdnurhrs1xc" path="res://mazeproject/standalone/spr_sizeref_external.png" id="1_dgf3h"]
+[ext_resource type="PackedScene" uid="uid://b0sy1n25is0mk" path="res://mazeproject/standalone/obj_randomplatforminst.tscn" id="2_cbaxd"]
+
+[sub_resource type="GDScript" id="GDScript_cbaxd"]
+script/source = "extends Node2D
+
+func _ready() -> void:
+	# Check if running within dreamweaver, if that's the case spawn dreamweaver field controller and camera objects.
+	# Do this by loading and checking if its null or not.
+	var controller = load(\"res://object/obj_dreamcontroller.tscn\") # These two will cause errors, but we can ignore that.
+	var camera = load(\"res://object/obj_camera.tscn\")
+	
+	if controller != null and camera != null:
+		# Spawn in these two via Main global script, make sure we have a dummy main so we don't get any script errors in standalone.
+		await Main.AddScene(controller) # Normally we can just load via passing the path of the node, but since we already have the assets in memory we can just pass the data here to attach them into the scene.
+		await Main.AddScene(camera)
+	else:
+		# Spawn in standalone assets.
+		# Cant really use Main.AddScene in this case, so we just add it in normally. Dreamweaver has its own hiearchy / scene system so I use a custom function for adding nodes there.
+		pass
+
+	# Hide size ref sprite.
+	$SprSizerefExternal.visible = false
+"
+
+[node name="Randommaze" type="Node2D"]
+texture_filter = 1
+texture_repeat = 1
+script = SubResource("GDScript_cbaxd")
+
+[node name="SprSizerefExternal" type="Sprite2D" parent="."]
+texture = ExtResource("1_dgf3h")
+
+[node name="ObjRandomPlatformInst" parent="." instance=ExtResource("2_cbaxd")]
+initial = true
+overrideLeft = true
+overrideUp = true
+overrideRight = true
+overrideDown = true
