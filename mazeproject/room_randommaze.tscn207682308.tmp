@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://sl058nwuufo0"]
+[gd_scene load_steps=5 format=3 uid="uid://sl058nwuufo0"]
 
-[ext_resource type="PackedScene" uid="uid://e6rtrqj5f5ak" path="res://mazeproject/standalone/obj_player.tscn" id="1_cbaxd"]
+[ext_resource type="Texture2D" uid="uid://c4tdnurhrs1xc" path="res://mazeproject/standalone/spr_sizeref_external.png" id="1_dgf3h"]
 [ext_resource type="PackedScene" uid="uid://b0sy1n25is0mk" path="res://mazeproject/standalone/obj_randomplatforminst.tscn" id="2_cbaxd"]
 
 [sub_resource type="GDScript" id="GDScript_cbaxd"]
@@ -26,12 +26,24 @@ func _ready() -> void:
 	#$SprSizerefExternal.visible = false
 "
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_cbaxd"]
+radius = 40.792156
+
 [node name="Randommaze" type="Node2D"]
 texture_filter = 1
 texture_repeat = 1
 script = SubResource("GDScript_cbaxd")
 
-[node name="ObjPlayer" parent="." instance=ExtResource("1_cbaxd")]
+[node name="player" type="StaticBody2D" parent="."]
+
+[node name="Camera2D" type="Camera2D" parent="player"]
+
+[node name="SprSizerefExternal" type="Sprite2D" parent="player"]
+texture = ExtResource("1_dgf3h")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="player"]
+shape = SubResource("CircleShape2D_cbaxd")
+debug_color = Color(1, 0, 0, 0.41960785)
 
 [node name="ObjRandomPlatformInst" parent="." instance=ExtResource("2_cbaxd")]
 initial = true

@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://e6rtrqj5f5ak"]
+
+[ext_resource type="Texture2D" uid="uid://c4tdnurhrs1xc" path="res://mazeproject/standalone/spr_sizeref_external.png" id="1_wmdtx"]
+
+[sub_resource type="GDScript" id="GDScript_vxkus"]
+script/source = "extends RigidBody2D
+
+@export var movespeed = 550
+
+var velocity = Vector2()
+
+func get_input():
+	velocity = Input.get_vector(\"i_moveleft\", \"i_moveright\", \"i_moveup\", \"i_movedown\")
+	
+
+func _physics_process(_delta):
+	get_input()
+	self.linear_velocity = velocity * movespeed
+	#self.position += velocity * movespeed
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cbaxd"]
+radius = 40.792156
+
+[node name="player" type="RigidBody2D"]
+collision_layer = 3
+collision_mask = 3
+gravity_scale = 0.0
+script = SubResource("GDScript_vxkus")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="SprSizerefExternal" type="Sprite2D" parent="."]
+texture = ExtResource("1_wmdtx")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_cbaxd")
+debug_color = Color(1, 0, 0, 0.41960785)
