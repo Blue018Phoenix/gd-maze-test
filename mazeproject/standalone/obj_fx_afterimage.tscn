@@ -1,0 +1,66 @@
+[gd_scene load_steps=6 format=3 uid="uid://bxpl16q06lq04"]
+
+[ext_resource type="Texture2D" uid="uid://b7d0d5x4fb1dj" path="res://mazeproject/standalone/spr_roaringfraud.png" id="1_ttxra"]
+
+[sub_resource type="GDScript" id="GDScript_qy2ip"]
+script/source = "extends Sprite2D
+
+@export var tex : Texture2D
+@export var direction : Vector2
+
+func _ready() -> void:
+	$\".\".texture = tex
+	await $fade.animation_finished
+	self.queue_free()
+
+func _physics_process(_delta: float) -> void:
+	self.global_position += direction
+"
+
+[sub_resource type="Animation" id="Animation_qy2ip"]
+resource_name = "default"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_ttxra"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1m442"]
+_data = {
+&"RESET": SubResource("Animation_ttxra"),
+&"default": SubResource("Animation_qy2ip")
+}
+
+[node name="ObjFxAfterimage" type="Sprite2D"]
+texture_filter = 1
+texture = ExtResource("1_ttxra")
+script = SubResource("GDScript_qy2ip")
+
+[node name="fade" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_1m442")
+}
+autoplay = "default"
+speed_scale = 2.0

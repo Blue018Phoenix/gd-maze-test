@@ -1,29 +1,50 @@
-[gd_scene load_steps=32 format=3 uid="uid://e6rtrqj5f5ak"]
+[gd_scene load_steps=28 format=3 uid="uid://e6rtrqj5f5ak"]
 
 [ext_resource type="Texture2D" uid="uid://b0d8wtew00ax1" path="res://mazeproject/standalone/spr_roaringfraud_intro.png" id="1_wmdtx"]
 
 [sub_resource type="GDScript" id="GDScript_vxkus"]
 script/source = "extends CharacterBody2D
 
+var aura = preload(\"res://mazeproject/standalone/obj_fx_afterimage.tscn\")
+
 @export var movespeed = 550
 
-var dvelocity = Vector2()
+var dvelocity : Vector2
+var auradirection : Vector2 = Vector2(2,0)
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed(\"i_special\"):
+		$fraudcontainment/SubViewport/Node2D/SprSizerefExternal.play(\"slash\")
 
 func get_input():
 	dvelocity = Input.get_vector(\"i_moveleft\", \"i_moveright\", \"i_moveup\", \"i_movedown\")
 	set_velocity(dvelocity*movespeed)
-	
 	if Input.is_action_pressed(\"i_moveleft\"):
 		$fraudcontainment/SubViewport/Node2D.scale.x = 1
-		$fraudcontainment/fakeaura.process_material.gravity = Vector3(200,0,0)
+		auradirection = Vector2(2,0)
 	if Input.is_action_pressed(\"i_moveright\"):
 		$fraudcontainment/SubViewport/Node2D.scale.x = -1
-		$fraudcontainment/fakeaura.process_material.gravity = Vector3(-200,0,0)
+		auradirection = Vector2(-2,0)
+
+var halt = false
+
+func afterimages():
+	if !halt:
+		halt = true
+		var b = aura.instantiate()
+		b.global_position = $fraudcontainment.global_position + Vector2(128,128)
+		b.tex = ImageTexture.create_from_image($fraudcontainment/SubViewport.get_texture().get_image())
+		b.scale = Vector2(0.5,0.5)
+		b.direction = auradirection
+		Main.CurrentWorld.add_child(b)
+		await get_tree().create_timer(0.06).timeout
+		halt = false
 
 func _physics_process(_delta):
 	get_input()
 	move_and_slide()
 	#self.position += velocity * movespeed
+	afterimages()
 "
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_a21mn"]
@@ -180,26 +201,45 @@ animations = [{
 "loop": true,
 "name": &"idle",
 "speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xoreq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d6qa2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e5a0o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6setr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_25ypg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s6pv4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hqpii")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5hurj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ufntt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o7oav")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ienl")
+}],
+"loop": false,
+"name": &"slash",
+"speed": 12.0
 }]
-
-[sub_resource type="ViewportTexture" id="ViewportTexture_wmdtx"]
-viewport_path = NodePath("fraudcontainment/SubViewport")
-
-[sub_resource type="Curve" id="Curve_a21mn"]
-_data = [Vector2(0, 0.516854), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
-point_count = 2
-
-[sub_resource type="CurveTexture" id="CurveTexture_460u3"]
-curve = SubResource("Curve_a21mn")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hcu3w"]
-particle_flag_disable_z = true
-angular_velocity_min = -1.0000161
-angular_velocity_max = 0.9999839
-gravity = Vector3(200, 0, 0)
-scale_min = 0.5
-scale_max = 0.5
-alpha_curve = SubResource("CurveTexture_460u3")
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_cbaxd"]
 radius = 40.792156
@@ -258,9 +298,11 @@ stretch = true
 
 [node name="SubViewport" type="SubViewport" parent="fraudcontainment"]
 transparent_bg = true
+handle_input_locally = false
 oversampling = false
 size_2d_override = Vector2i(512, 512)
 size_2d_override_stretch = true
+render_target_update_mode = 4
 
 [node name="Node2D" type="Node2D" parent="fraudcontainment/SubViewport"]
 position = Vector2(256, 256)
@@ -270,17 +312,10 @@ texture_filter = 1
 position = Vector2(48, -32)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_mn302")
+animation = &"slash"
 autoplay = "default"
-frame = 19
+frame = 10
 frame_progress = 1.0
-
-[node name="fakeaura" type="GPUParticles2D" parent="fraudcontainment"]
-z_index = -1
-position = Vector2(256, 256)
-scale = Vector2(4, 4)
-amount = 16
-texture = SubResource("ViewportTexture_wmdtx")
-process_material = SubResource("ParticleProcessMaterial_hcu3w")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
