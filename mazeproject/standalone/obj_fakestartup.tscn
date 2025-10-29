@@ -175,7 +175,7 @@ volume_db = 10.0
 
 [node name="Polygon2D" type="Polygon2D" parent="."]
 clip_children = 2
-color = Color(0.14117648, 0.14117648, 0.14117648, 1)
+color = Color(0, 0, 0, 1)
 polygon = PackedVector2Array(-64, -64, -64, 768, 576, 768, 768, -64)
 
 [node name="Splash" type="Sprite2D" parent="Polygon2D"]
@@ -185,7 +185,7 @@ texture = ExtResource("1_f0cyv")
 
 [node name="Polygon2D2" type="Polygon2D" parent="."]
 clip_children = 2
-color = Color(0.14117648, 0.14117648, 0.14117648, 1)
+color = Color(0, 0, 0, 1)
 polygon = PackedVector2Array(1344, -64, 1344, 768, 576, 768, 768, -64)
 
 [node name="Splash" type="Sprite2D" parent="Polygon2D2"]
