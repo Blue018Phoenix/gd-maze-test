@@ -31,11 +31,11 @@ texture_filter = 1
 texture_repeat = 1
 script = SubResource("GDScript_cbaxd")
 
-[node name="ObjPlayer" parent="." instance=ExtResource("1_cbaxd")]
-
 [node name="ObjRandomPlatformInst" parent="." instance=ExtResource("2_cbaxd")]
 initial = true
 overrideLeft = true
 overrideUp = true
 overrideRight = true
 overrideDown = true
+
+[node name="ObjPlayer" parent="." instance=ExtResource("1_cbaxd")]

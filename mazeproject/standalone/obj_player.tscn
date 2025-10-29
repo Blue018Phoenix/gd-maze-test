@@ -1,38 +1,295 @@
-[gd_scene load_steps=4 format=3 uid="uid://e6rtrqj5f5ak"]
+[gd_scene load_steps=32 format=3 uid="uid://e6rtrqj5f5ak"]
 
-[ext_resource type="Texture2D" uid="uid://c4tdnurhrs1xc" path="res://mazeproject/standalone/spr_sizeref_external.png" id="1_wmdtx"]
+[ext_resource type="Texture2D" uid="uid://b0d8wtew00ax1" path="res://mazeproject/standalone/spr_roaringfraud_intro.png" id="1_wmdtx"]
 
 [sub_resource type="GDScript" id="GDScript_vxkus"]
-script/source = "extends RigidBody2D
+script/source = "extends CharacterBody2D
 
 @export var movespeed = 550
 
-var velocity = Vector2()
+var dvelocity = Vector2()
 
 func get_input():
-	velocity = Input.get_vector(\"i_moveleft\", \"i_moveright\", \"i_moveup\", \"i_movedown\")
+	dvelocity = Input.get_vector(\"i_moveleft\", \"i_moveright\", \"i_moveup\", \"i_movedown\")
+	set_velocity(dvelocity*movespeed)
 	
+	if Input.is_action_pressed(\"i_moveleft\"):
+		$fraudcontainment/SubViewport/Node2D.scale.x = 1
+		$fraudcontainment/fakeaura.process_material.gravity = Vector3(200,0,0)
+	if Input.is_action_pressed(\"i_moveright\"):
+		$fraudcontainment/SubViewport/Node2D.scale.x = -1
+		$fraudcontainment/fakeaura.process_material.gravity = Vector3(-200,0,0)
 
 func _physics_process(_delta):
 	get_input()
-	self.linear_velocity = velocity * movespeed
+	move_and_slide()
 	#self.position += velocity * movespeed
 "
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a21mn"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(0, 0, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_460u3"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(268, 0, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hcu3w"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(536, 0, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hthcu"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(804, 0, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ct8v"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(1072, 0, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jo78v"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(0, 272, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ki0k0"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(268, 272, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i73on"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(536, 272, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_du6wp"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(804, 272, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xoreq"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(1072, 272, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d6qa2"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(0, 544, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e5a0o"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(268, 544, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6setr"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(536, 544, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_25ypg"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(804, 544, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s6pv4"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(1072, 544, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hqpii"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(0, 816, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5hurj"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(268, 816, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ufntt"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(536, 816, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o7oav"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(804, 816, 268, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ienl"]
+atlas = ExtResource("1_wmdtx")
+region = Rect2(1072, 816, 268, 272)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_mn302"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a21mn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_460u3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hcu3w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hthcu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ct8v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jo78v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ki0k0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i73on")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_du6wp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xoreq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d6qa2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e5a0o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6setr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_25ypg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s6pv4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hqpii")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5hurj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ufntt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o7oav")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ienl")
+}],
+"loop": false,
+"name": &"default",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ienl")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 12.0
+}]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_wmdtx"]
+viewport_path = NodePath("fraudcontainment/SubViewport")
+
+[sub_resource type="Curve" id="Curve_a21mn"]
+_data = [Vector2(0, 0.516854), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_460u3"]
+curve = SubResource("Curve_a21mn")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_hcu3w"]
+particle_flag_disable_z = true
+angular_velocity_min = -1.0000161
+angular_velocity_max = 0.9999839
+gravity = Vector3(200, 0, 0)
+scale_min = 0.5
+scale_max = 0.5
+alpha_curve = SubResource("CurveTexture_460u3")
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_cbaxd"]
 radius = 40.792156
 
-[node name="player" type="RigidBody2D"]
+[sub_resource type="Animation" id="Animation_wmdtx"]
+resource_name = "default"
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("fraudcontainment:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(-136, -128), Vector2(-136, -120.03)]
+}
+
+[sub_resource type="Animation" id="Animation_a21mn"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("fraudcontainment:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-136, -128)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_460u3"]
+_data = {
+&"RESET": SubResource("Animation_a21mn"),
+&"default": SubResource("Animation_wmdtx")
+}
+
+[node name="ObjPlayer" type="CharacterBody2D"]
+z_index = 10
 collision_layer = 3
 collision_mask = 3
-gravity_scale = 0.0
 script = SubResource("GDScript_vxkus")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="fraudcontainment" type="SubViewportContainer" parent="."]
+offset_left = -136.0
+offset_top = -128.0
+offset_right = 376.0
+offset_bottom = 384.0
+scale = Vector2(0.5, 0.5)
+stretch = true
 
-[node name="SprSizerefExternal" type="Sprite2D" parent="."]
-texture = ExtResource("1_wmdtx")
+[node name="SubViewport" type="SubViewport" parent="fraudcontainment"]
+transparent_bg = true
+oversampling = false
+size_2d_override = Vector2i(512, 512)
+size_2d_override_stretch = true
+
+[node name="Node2D" type="Node2D" parent="fraudcontainment/SubViewport"]
+position = Vector2(256, 256)
+
+[node name="SprSizerefExternal" type="AnimatedSprite2D" parent="fraudcontainment/SubViewport/Node2D"]
+texture_filter = 1
+position = Vector2(48, -32)
+scale = Vector2(1.5, 1.5)
+sprite_frames = SubResource("SpriteFrames_mn302")
+autoplay = "default"
+frame = 19
+frame_progress = 1.0
+
+[node name="fakeaura" type="GPUParticles2D" parent="fraudcontainment"]
+z_index = -1
+position = Vector2(256, 256)
+scale = Vector2(4, 4)
+amount = 16
+texture = SubResource("ViewportTexture_wmdtx")
+process_material = SubResource("ParticleProcessMaterial_hcu3w")
+
+[node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_cbaxd")
 debug_color = Color(1, 0, 0, 0.41960785)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_460u3")
+}
+autoplay = "default"
