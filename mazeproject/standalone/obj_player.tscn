@@ -1,4 +1,4 @@
-[gd_scene load_steps=61 format=3 uid="uid://e6rtrqj5f5ak"]
+[gd_scene load_steps=62 format=3 uid="uid://e6rtrqj5f5ak"]
 
 [ext_resource type="Texture2D" uid="uid://b0d8wtew00ax1" path="res://mazeproject/standalone/spr_roaringfraud_intro.png" id="1_wmdtx"]
 [ext_resource type="Texture2D" uid="uid://df6og1m1cbeil" path="res://mazeproject/standalone/spr_roaringfraud_flight.png" id="2_7ct8v"]
@@ -6,6 +6,7 @@
 [ext_resource type="AudioStream" uid="uid://m58v02y7l2i1" path="res://mazeproject/standalone/fraudtrack.ogg" id="2_a21mn"]
 [ext_resource type="Texture2D" uid="uid://brq2qt4si0gd8" path="res://mazeproject/standalone/spr_roaringfraud_mash.png" id="2_hcu3w"]
 [ext_resource type="Texture2D" uid="uid://bqxpxgtushbva" path="res://mazeproject/standalone/spr_roaringfraud_startflight.png" id="3_jo78v"]
+[ext_resource type="PackedScene" uid="uid://btm062cc7kdsk" path="res://mazeproject/standalone/obj_fakestartup.tscn" id="6_jo78v"]
 
 [sub_resource type="GDScript" id="GDScript_vxkus"]
 script/source = "extends CharacterBody2D
@@ -17,6 +18,11 @@ var aura = preload(\"res://mazeproject/standalone/obj_fx_afterimage.tscn\")
 var dvelocity : Vector2
 var auradirection : Vector2 = Vector2(2,0)
 var speedmultiplier = 1
+
+func _ready() -> void:
+	await $Camera2D/fakeroot/ObjFakestartup.get_node(\"anim\").animation_finished
+	$fraudcontainment/SubViewport/Node2D/SprSizerefExternal.play(\"default\")
+	$AudioStreamPlayer.play()
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed(\"i_flight\") and speedmultiplier == 1:
@@ -520,10 +526,17 @@ texture_filter = 1
 position = Vector2(48, -32)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_mn302")
-animation = &"flightstart"
 autoplay = "default"
 
 [node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(1.5, 1.5)
+
+[node name="fakeroot" type="Node2D" parent="Camera2D"]
+position = Vector2(-480, -270)
+
+[node name="ObjFakestartup" parent="Camera2D/fakeroot" instance=ExtResource("6_jo78v")]
+z_index = 100
+scale = Vector2(0.75, 0.75)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_cbaxd")
@@ -537,5 +550,3 @@ autoplay = "default"
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_a21mn")
-pitch_scale = 1.1
-autoplay = true
