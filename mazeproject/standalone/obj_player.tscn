@@ -1,9 +1,11 @@
-[gd_scene load_steps=62 format=3 uid="uid://e6rtrqj5f5ak"]
+[gd_scene load_steps=64 format=3 uid="uid://e6rtrqj5f5ak"]
 
+[ext_resource type="AudioStream" uid="uid://b1hddic7h1kl5" path="res://mazeproject/standalone/utdr_sfx/snd_knight_cut.wav" id="1_i73on"]
 [ext_resource type="Texture2D" uid="uid://b0d8wtew00ax1" path="res://mazeproject/standalone/spr_roaringfraud_intro.png" id="1_wmdtx"]
 [ext_resource type="Texture2D" uid="uid://df6og1m1cbeil" path="res://mazeproject/standalone/spr_roaringfraud_flight.png" id="2_7ct8v"]
 [ext_resource type="Texture2D" uid="uid://celxf87m2g7w8" path="res://mazeproject/standalone/spr_roaringfraud_slash.png" id="2_460u3"]
 [ext_resource type="AudioStream" uid="uid://m58v02y7l2i1" path="res://mazeproject/standalone/fraudtrack.ogg" id="2_a21mn"]
+[ext_resource type="AudioStream" uid="uid://bmpr5thqxnncu" path="res://mazeproject/standalone/utdr_sfx/snd_knight_cut2.wav" id="2_du6wp"]
 [ext_resource type="Texture2D" uid="uid://brq2qt4si0gd8" path="res://mazeproject/standalone/spr_roaringfraud_mash.png" id="2_hcu3w"]
 [ext_resource type="Texture2D" uid="uid://bqxpxgtushbva" path="res://mazeproject/standalone/spr_roaringfraud_startflight.png" id="3_jo78v"]
 [ext_resource type="PackedScene" uid="uid://btm062cc7kdsk" path="res://mazeproject/standalone/obj_fakestartup.tscn" id="6_jo78v"]
@@ -15,8 +17,8 @@ var aura = preload(\"res://mazeproject/standalone/obj_fx_afterimage.tscn\")
 
 @export var movespeed = 550
 
-var dvelocity : Vector2
-var auradirection : Vector2 = Vector2(2,0)
+var dvelocity : Vector2 # Directional velocity
+var auradirection : Vector2 = Vector2(2,0) # Afterimage velocity
 var speedmultiplier = 1
 
 func _ready() -> void:
@@ -25,9 +27,9 @@ func _ready() -> void:
 	$AudioStreamPlayer.play()
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed(\"i_flight\") and speedmultiplier == 1:
+	if event.is_action_pressed(\"i_flight\") and speedmultiplier == 1: # Lock transition animation into flight mode.
 		speedmultiplier = 0.9
-		$fraudcontainment/SubViewport/Node2D/SprSizerefExternal.offset.y = 20.0
+		$fraudcontainment/SubViewport/Node2D/SprSizerefExternal.offset.y = 20.0 # The sprites are diff sizes so I need to adjust the spr offset
 		$fraudcontainment/SubViewport/Node2D/SprSizerefExternal.play(\"flightstart\")
 		await $fraudcontainment/SubViewport/Node2D/SprSizerefExternal.animation_finished
 		$fraudcontainment/SubViewport/Node2D/SprSizerefExternal.offset.y = 45.0
@@ -44,8 +46,12 @@ func _input(event: InputEvent) -> void:
 	elif event.is_action_pressed(\"i_special\") and speedmultiplier == 1:
 		if $fraudcontainment/SubViewport/Node2D/SprSizerefExternal.animation == \"slash\":
 			$fraudcontainment/SubViewport/Node2D/SprSizerefExternal.play(\"mash\")
+			while $fraudcontainment/SubViewport/Node2D/SprSizerefExternal.animation == \"mash\":
+				$SndKnightCut2.play()
+				await get_tree().create_timer(0.1).timeout
 		else:
 			$fraudcontainment/SubViewport/Node2D/SprSizerefExternal.play(\"slash\")
+			$SndKnightCut.play()
 			await $fraudcontainment/SubViewport/Node2D/SprSizerefExternal.animation_finished
 			$fraudcontainment/SubViewport/Node2D/SprSizerefExternal.play(\"idle\")
 
@@ -53,15 +59,15 @@ func get_input():
 	dvelocity = Input.get_vector(\"i_moveleft\", \"i_moveright\", \"i_moveup\", \"i_movedown\")
 	set_velocity(dvelocity*(movespeed*speedmultiplier))
 	if Input.is_action_pressed(\"i_moveleft\"):
-		$fraudcontainment/SubViewport/Node2D.scale.x = 1
+		$fraudcontainment/SubViewport/Node2D.scale.x = 1 # Change the X Scale of the roaring fraud to simulate a change of direction without needing seperate sprites
 		auradirection = Vector2(2,0)
 	if Input.is_action_pressed(\"i_moveright\"):
 		$fraudcontainment/SubViewport/Node2D.scale.x = -1
 		auradirection = Vector2(-2,0)
 
-var halt = false
+var halt = false # Enforces a delay so there aren't too many afterimages.
 
-func afterimages():
+func afterimages(): # Effectively this gets the viewport texture of the subviewport, and saves the current frame as a texture. Then that's passed onto this Afterimage object.
 	if !halt:
 		halt = true
 		var b = aura.instantiate()
@@ -274,6 +280,14 @@ region = Rect2(936, 0, 234, 230)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_mn302"]
 animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a21mn")
+}],
+"loop": true,
+"name": &"before",
+"speed": 5.0
+}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_a21mn")
@@ -502,6 +516,16 @@ collision_layer = 3
 collision_mask = 3
 script = SubResource("GDScript_vxkus")
 
+[node name="SndKnightCut" type="AudioStreamPlayer2D" parent="."]
+position = Vector2(-512, 16)
+stream = ExtResource("1_i73on")
+volume_db = 5.0
+
+[node name="SndKnightCut2" type="AudioStreamPlayer2D" parent="."]
+position = Vector2(-512, 32)
+stream = ExtResource("2_du6wp")
+volume_db = 5.0
+
 [node name="fraudcontainment" type="SubViewportContainer" parent="."]
 offset_left = -136.0
 offset_top = -128.0
@@ -526,7 +550,9 @@ texture_filter = 1
 position = Vector2(48, -32)
 scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_mn302")
-autoplay = "default"
+animation = &"before"
+autoplay = "before"
+frame_progress = 0.9591502
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.5, 1.5)
@@ -550,3 +576,4 @@ autoplay = "default"
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("2_a21mn")
+volume_db = -2.0

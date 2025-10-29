@@ -25,6 +25,8 @@ func go():
 	# Essentially, this would use a randi_range of 0 to 2 to determine whether to spawn nothing, a chest, or an enemy.
 	# Then it would randomize the encounter size from 1 to 3, or spawn a chest with a random item ID.
 	
+	# I'll prolly add something here in standalone to spawn a placeholder enemy or a item.
+	
 	# Randomize the directions we can go in.
 	for i in range(0,4):
 		# 0 = Left, 1 = Up, 2 = Right, 3 = Down
