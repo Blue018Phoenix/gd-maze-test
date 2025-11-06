@@ -16,10 +16,17 @@ script/source = "extends CharacterBody2D
 var aura = preload(\"res://mazeproject/standalone/obj_fx_afterimage.tscn\")
 
 @export var movespeed = 550
+@export var health = 100
 
 var dvelocity : Vector2 # Directional velocity
 var auradirection : Vector2 = Vector2(2,0) # Afterimage velocity
 var speedmultiplier = 1
+
+func hurt(val):
+	health -= val
+	
+	if health <= 0:
+		pass # Trigger gameover
 
 func _ready() -> void:
 	await $Camera2D/fakeroot/ObjFakestartup.get_node(\"anim\").animation_finished
@@ -470,7 +477,22 @@ animations = [{
 }]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_cbaxd"]
-radius = 40.792156
+radius = 40.7922
+
+[sub_resource type="Animation" id="Animation_a21mn"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("fraudcontainment:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-136, -128)]
+}
 
 [sub_resource type="Animation" id="Animation_wmdtx"]
 resource_name = "default"
@@ -487,21 +509,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(-136, -128), Vector2(-136, -120.03)]
-}
-
-[sub_resource type="Animation" id="Animation_a21mn"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("fraudcontainment:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(-136, -128)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_460u3"]
@@ -537,7 +544,6 @@ stretch = true
 [node name="SubViewport" type="SubViewport" parent="fraudcontainment"]
 transparent_bg = true
 handle_input_locally = false
-oversampling = false
 size_2d_override = Vector2i(512, 512)
 size_2d_override_stretch = true
 render_target_update_mode = 4
@@ -552,7 +558,7 @@ scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_mn302")
 animation = &"before"
 autoplay = "before"
-frame_progress = 0.9591502
+frame_progress = 0.95915
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(1.5, 1.5)
@@ -566,7 +572,7 @@ scale = Vector2(0.75, 0.75)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_cbaxd")
-debug_color = Color(1, 0, 0, 0.41960785)
+debug_color = Color(1, 0, 0, 0.419608)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
